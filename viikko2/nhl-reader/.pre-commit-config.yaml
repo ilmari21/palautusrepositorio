@@ -1,0 +1,10 @@
+repos:
+- repo: local
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: uv run --directory viikko2/nhl-reader pylint src
+      language: system
+      types: [python]
+      require_serial: true
+      pass_filenames: false
