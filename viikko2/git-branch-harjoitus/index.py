@@ -1,6 +1,6 @@
 # tehdään alussa importit
 
-from logger import logger
+from logger import logger # muutos kopioon
 from summa import summa
 from erotus import erotus
 
