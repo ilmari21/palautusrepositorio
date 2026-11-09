@@ -7,3 +7,9 @@ class PlayerStats:  # pylint: disable=too-few-public-methods
         filtered_players = filter(lambda player: player.nationality == nationality, players)
         sorted_players = sorted(filtered_players, key=lambda player: player.points, reverse=True)
         return sorted_players
+
+    def top_scorers_by_team(self, team):
+        players = self.player_reader.get_players()
+        filtered_players = filter(lambda player: player.team == team, players)
+        sorted_players = sorted(filtered_players, key=lambda player: player.points, reverse=True)
+        return sorted_players

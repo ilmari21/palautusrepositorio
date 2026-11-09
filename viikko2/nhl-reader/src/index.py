@@ -7,22 +7,53 @@ from player_stats import PlayerStats
 
 def main():
     console = Console()
-    season = Prompt.ask("Season", choices=["2023-24", "2024-25", "2025-26"])
+    season = Prompt.ask("Season", choices=["2023-24", "2024-25", "2025-26", "2026-27"])
     stats = create_stats(season)
+    run_queries(console, stats, season)
 
+
+def run_queries(console, stats, season):
     while True:
-        nationality = ask_nationality()
-        if nationality is None:
+        search_type = ask_search_type()
+        if search_type is None:
             break
 
-        players = stats.top_scorers_by_nationality(nationality)
-        table = create_table(players, nationality, season)
+        result = search_players(stats, search_type)
+        if result is None:
+            break
+        players, value = result
+        table = create_table(players, value, season)
         console.print(table)
 
 
 def create_stats(season):
     url = f"https://studies.cs.helsinki.fi/nhlstats/{season}/players"
     return PlayerStats(PlayerReader(url))
+
+
+def ask_search_type():
+    search_type = Prompt.ask(
+        "Search by (q to quit)",
+        choices=["nationality", "team", "q"],
+        case_sensitive=False,
+    )
+    if search_type.lower() == "q":
+        return None
+
+    return search_type.lower()
+
+
+def search_players(stats, search_type):
+    if search_type == "nationality":
+        value = ask_nationality()
+        if value is None:
+            return None
+        return stats.top_scorers_by_nationality(value), value
+
+    value = ask_team()
+    if value is None:
+        return None
+    return stats.top_scorers_by_team(value), value
 
 
 def ask_nationality():
@@ -38,8 +69,16 @@ def ask_nationality():
     return nationality.upper()
 
 
-def create_table(players, nationality, season):
-    table = Table(title=f"Top scorers from {nationality} ({season})")
+def ask_team():
+    team = Prompt.ask("Team abbreviation (q to quit)")
+    if team.lower() == "q":
+        return None
+
+    return team.upper()
+
+
+def create_table(players, value, season):
+    table = Table(title=f"Top scorers from {value} ({season})")
     table.add_column("Player", style="cyan")
     table.add_column("Team(s)", style="magenta")
     table.add_column("Goals", justify="right", style="green")
